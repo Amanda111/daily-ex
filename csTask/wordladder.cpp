@@ -1,20 +1,14 @@
-// This is the CPP file you will edit and turn in.
-// Also remove these comments here and add your own.
-// TODO: remove this comment header
-
 #include <cctype>
 #include <cmath>
 #include "simpio.h"
-#include "vector.h"
 #include <string>
 #include <stack>
 #include "stack.h"
 #include "queue.h"
-#include "map.h"
+#include "lexicon.h"
 #include <fstream>
 #include <iostream>
 #include "console.h"
-
 
 using namespace std;
 
@@ -29,36 +23,10 @@ void AskUserForInputFile(string prompt, ifstream & infile) {
     }
 }
 
-
-void ReadTextFile(ifstream & infile, Vector<string> & lines) {
-   while (true) {
-      string line;
-      getLine(infile, line);
-      if (infile.fail()) break;
-      lines.add(line);
-    }
-}
-
-void PrintReversed(Vector<string> & lines) {
-   for (int i = lines.size() - 1; i >= 0; i--) {
-      cout << lines[i] << endl;
-   }
-}
-
-bool LocateWord(Vector<string> & lines,string word){
-    for (int i = 0; i <= lines.size() - 1; i++) {
-       if(lines[i] == word){
-           return true;
-       }
-    }
-    return false;
-}
-
-
-bool Ladder(string input,string output,Stack<string> &stringStack,Vector<string> & lines){
+bool Ladder(string input,string output,Stack<string> &stringStack,Lexicon & lines){
     Queue<Stack<string>> stackqueue;
     Stack<string> newStack;
-    Map<string,string> hadfound;
+    Lexicon hadfound;
     newStack.push(input);
     stackqueue.enqueue(newStack);
     while(!stackqueue.isEmpty()){
@@ -68,8 +36,8 @@ bool Ladder(string input,string output,Stack<string> &stringStack,Vector<string>
             string charinput = neighbour;
             for(int j = 97;j<=122;j++){
                 charinput[i]= char(j);
-                if(charinput != neighbour && LocateWord(lines,charinput)){
-                    if(!hadfound.containsKey(charinput)){
+                if(charinput != neighbour && lines.contains(charinput)){
+                    if(!hadfound.contains(charinput)){
                         if(charinput == output){
                             newStack.push(charinput);
                             stringStack = newStack;
@@ -79,6 +47,7 @@ bool Ladder(string input,string output,Stack<string> &stringStack,Vector<string>
                             copyStack = newStack;
                             copyStack.push(charinput);
                             stackqueue.enqueue(copyStack);
+                            hadfound.add(charinput);
                         }
                     }
                 }
@@ -89,32 +58,33 @@ bool Ladder(string input,string output,Stack<string> &stringStack,Vector<string>
     return false;
 }
 
-
-
-
 int main() {
     // TODO: Finish the program!
     ifstream infile;
     AskUserForInputFile("Input file: ", infile);
-    Vector<string> lines;
-    ReadTextFile(infile, lines);
+    Lexicon lines(infile);
     infile.close();
     string inputWord,outputWord;
     cout<<"Word #1 (or Enter to quit): ";
     cin>>inputWord;
     cout<<"Word #2 (or Enter to quit): ";
     cin>>outputWord;
+    inputWord = toLowerCase(inputWord);
+    outputWord = toLowerCase(outputWord);
     Stack<string> stringStack;
-    Map<string,string> hadfound;
     if(inputWord != outputWord){
         if(inputWord.length() == outputWord.length()){
-            if(LocateWord(lines,inputWord) && LocateWord(lines,outputWord)){
+            if(lines.contains(inputWord) && lines.contains(outputWord)){
                 if(Ladder(inputWord,outputWord,stringStack,lines)){
                     while(stringStack.size()){
                         string hah = stringStack.pop();
                         cout<<hah<<endl;
                     }
-                };
+                }else{
+                    cout<<"Ladder is not found"<<endl;
+                }
+            }else{
+                cout<<"make sure the words are both in the dict"<<endl;
             }
         }else{
             cout<<"are not the same length"<<endl;
@@ -122,7 +92,6 @@ int main() {
     }else{
         cout<<"they are the same word"<<endl;
     }
-//    PrintReversed(lines);
     cout << "Have a nice day." << endl;
     return 0;
 }

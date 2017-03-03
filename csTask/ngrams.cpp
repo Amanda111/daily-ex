@@ -22,7 +22,7 @@ void AskUserForInputFile(string prompt, ifstream & infile) {
     }
 }
 
-void AddToDict(Map<Vector<string>,Vector<string>> &dict,string text,Vector<string> key,Vector<Vector<string>> &keys){
+void AddToDict(Map<Vector<string>,Vector<string>> &dict,string text,Vector<string> key){
     Vector<string> values;
     values.add(text);
     if(dict.containsKey(key)){
@@ -32,11 +32,10 @@ void AddToDict(Map<Vector<string>,Vector<string>> &dict,string text,Vector<strin
     }else{
         dict.put(key,values);
         cout<<key<<endl;
-        keys.add(key);
     }
 }
 
-void ReadTextFile(ifstream & infile, Map<Vector<string>,Vector<string>> &dict,Vector<Vector<string>> &keys,int num) {
+void ReadTextFile(ifstream & infile, Map<Vector<string>,Vector<string>> &dict,int num) {
    int a = 1;
    string text;
    Vector<string> key;
@@ -48,50 +47,51 @@ void ReadTextFile(ifstream & infile, Map<Vector<string>,Vector<string>> &dict,Ve
           key.add(text);
           fronts.add(text);
       }else{
-          AddToDict(dict,text,key,keys);
+          AddToDict(dict,text,key);
           key.remove(0);
           key.add(text);
       }
       a++;
     }
-   //
    for(int i = 0;i<num-1;i++){
-       AddToDict(dict,fronts[i],key,keys);
+       AddToDict(dict,fronts[i],key);
        key.remove(0);
        key.add(fronts[i]);
    }
 }
 
-void Generator(Vector<string> &start,Map<Vector<string>,Vector<string>> dict,Vector<string> &para,int words){
+void Generator(Vector<string> &start,Map<Vector<string>,Vector<string>> dict,int a,int words){
+    if(a>=words) return;
     Vector<string> suffix;
     suffix = dict.get(start);
     int rvalue = randomInteger(0, suffix.size()-1);
-    cout<<suffix[rvalue]<<endl;
-    para.add(suffix[rvalue]);
+    cout<<suffix[rvalue]<<" ";
     start.remove(0);
     start.add(suffix[rvalue]);
-    if(para.size()>words) return;
-    Generator(start,dict,para,words);
+    a+=1;
+    Generator(start,dict,a,words);
 }
 
 int main() {
-    // TODO: Finish the program!
     ifstream infile;
     AskUserForInputFile("Input file: ", infile);
     Map<Vector<string>,Vector<string>> dict;
-    Vector<Vector<string>> keys;
-    Vector<string> para;
     int num,words;
     cout<< "Value of N?";
     cin >> num;
-    ReadTextFile(infile, dict,keys,num);
+    ReadTextFile(infile, dict,num);
     infile.close();
     cout<<"# of random words to generate (0 to quit)?";
     cin >> words;
+    Vector<Vector<string>> keys;
+    Vector<string> start;
+    keys = dict.keys();
     int rkey = randomInteger(0, keys.size()-1);
-    cout<<keys[rkey]<<endl;
-    para = keys[rkey];
-    Generator(keys[rkey],dict,para,words);
-    cout << "Exiting." << endl;
+    start = keys[rkey];
+    int a = start.size();
+    for(int i = 0;i<a;i++){
+        cout<<start[i]<<" ";
+    }
+    Generator(start,dict,a,words);
     return 0;
 }
