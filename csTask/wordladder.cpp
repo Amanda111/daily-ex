@@ -25,31 +25,27 @@ void AskUserForInputFile(string prompt, ifstream & infile) {
 
 bool Ladder(string input,string output,Stack<string> &stringStack,Lexicon & lines){
     Queue<Stack<string>> stackqueue;
-    Stack<string> newStack;
     Lexicon hadfound;
-    newStack.push(input);
-    stackqueue.enqueue(newStack);
+    hadfound.add(input);
+    stringStack.push(input);
+    stackqueue.enqueue(stringStack);
     while(!stackqueue.isEmpty()){
-        newStack = stackqueue.dequeue();
-        string neighbour = newStack.peek();
+        stringStack = stackqueue.dequeue();
+        string neighbour = stringStack.peek();
         for(int i = 0;i<neighbour.length();i++){
             string charinput = neighbour;
-            for(int j = 97;j<=122;j++){
-                charinput[i]= char(j);
-                if(charinput != neighbour && lines.contains(charinput)){
-                    if(!hadfound.contains(charinput)){
-                        if(charinput == output){
-                            newStack.push(charinput);
-                            stringStack = newStack;
-                            return true;
-                        }else{
-                            Stack<string> copyStack;
-                            copyStack = newStack;
-                            copyStack.push(charinput);
-                            stackqueue.enqueue(copyStack);
-                            hadfound.add(charinput);
-                        }
-                    }
+            for(int j = 0;j<26;j++){
+                charinput[i]= 'a' + j;
+                if(charinput == output){
+                    stringStack.push(charinput);
+                    return true;
+                }
+                if(!hadfound.contains(charinput) && lines.contains(charinput)){
+                    Stack<string> copyStack;
+                    copyStack = stringStack;
+                    copyStack.push(charinput);
+                    stackqueue.enqueue(copyStack);
+                    hadfound.add(charinput);
                 }
             }
         }
