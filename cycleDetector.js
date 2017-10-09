@@ -12,7 +12,8 @@ var obj = {
   ha: null
 }
 obj.ha = obj.foo // foo->bar->baz->aChild->foo形成环
-// JSON.stringify(obj) // => TypeError: Converting circular personucture to JSON
+JSON.stringify(obj) // => TypeError: Converting circular personucture to JSON
+
 
 var cache = []
 function cycleDetector(obj) {
@@ -20,17 +21,19 @@ function cycleDetector(obj) {
         if(typeof obj[val] == 'object' && obj[val] !== null){
             var index = cache.indexOf(val)
             if(index > -1) {
-                console.log(obj) // loop start position
+                // console.log(obj) // loop start position
                 return false
             } else {
                 if(obj.hasOwnProperty(val)){
+                    console.log(obj.name)
+                    console.log(cache.slice(-1)[0])
                     if(obj.name !== cache.slice(-1)[0]){
                         cache = []
                     }
                 }
                 cache.push(val)
-                cycleDetector(obj[val])
             }
+            cycleDetector(obj[val])
         }
     });
     return true
